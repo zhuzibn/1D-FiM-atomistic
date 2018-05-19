@@ -27,9 +27,9 @@ constantfile;
 clear gam
 %unknown params
 if paramselec
-%     muRE=7.63*mub;%[J/T], magnetic moment, refer to my paper "Theoretical
-%     %Proposal for Determining Angular Momentum Compensation in Ferrimagnets"
-%     muTM=2.217*mub;%[J/T], magnetic moment
+    %     muRE=7.63*mub;%[J/T], magnetic moment, refer to my paper "Theoretical
+    %     %Proposal for Determining Angular Momentum Compensation in Ferrimagnets"
+    %     muTM=2.217*mub;%[J/T], magnetic moment
 else
     d=0.4e-9;%[m],distance between two spin, no use when no dipolar field
     if DMIenable
@@ -67,13 +67,39 @@ else
     gTM=2;gRE=2;%g-factor
     tsteppaper=0.1e-15;%[s]
 end
-%other parameters
+%% electrical parameters
+jc=0;%[A/m2]
+jc2=1e5;%[A/m2]
+Hext=[0,0,0e-3];%corresponding to runtime
+Hext2=[0,0,400e-3];% corresponding to runtime2
+%% FiM parameters
+tz=d;%[m],thickness of FiM
+mmu=3.45*mub;%[J/T],refer to 2016-Antiferromagnetic Domain Wall Motion Driven by Spin-Orbit Torques-PRL-Takayuki Shiino
+ms=mmu/d^3;%[A/m], saturation magnetization
+%% SOT parameters
+SOT_DLT=1;%1(0),enable(disable) SOT damping torque
+SOT_FLT=0;%1(0),enable(disable) SOT field-like torque
+psjSHE=[0,1,0];%spin flux polarization
+psjSHEx=psjSHE(1);
+psjSHEy=psjSHE(2);
+psjSHEz=psjSHE(3);
+thetaSH=0.2;%spin hall angle
+if SOT_FLT
+    chi=0;%ratio of FLT/DLT
+else
+    chi=0;
+end
+BD=hbar/2*thetaSH*jc/(ms*tz);%[T]
+BD2=hbar/2*thetaSH*jc2/(ms*tz);
+BF=chi*BD;
+BF2=chi*BD2;
+%% other parameters
 %natom=1000;
-natom=52;
+natom=10;
 dmdt_stop_count=20;%continuously 20 times is recgnized as complete.
 dmdt_stop_count_tmp=0;
 TA=201.66;%from Fig. 1(b) in paper
-TA=149.4642;%calculated from muTM,muRE,gamTM,gamRE in code 
+TA=149.4642;%calculated from muTM,muRE,gamTM,gamRE in code
 T_=[108.6484,130.3781,152.1078,173.8375,217.2968,239.0265,260.7562,282.4859];
 %corresponds to delta_s=[-0.8,-0.6,-0.4,-0.2,0.2,0.4,0.6,0.8]e-7 [J.s/m^3]
 T=108;%[K]
@@ -82,31 +108,29 @@ muTM=(-0.6855*T+1242)*(1e3)*d^3;%[A.m^2=J/T]
 muRE=(-0.462*T+1105)*(1e3)*d^3;%[A.m^2=J/T]
 delta_sy=0.009204*T-1.8;%[e-7J.s/m^3]
 if paramselec
-tstep=2e-15;
-if loadstartm
-   runtime=0; 
+    tstep=2e-15;
+    if loadstartm
+        runtime=0;
+    else
+        runtime=2*gpusave;%first run for relaxation
+    end
+    runtime2=1*gpusave;%second run for dw motion
+    dmdt_stop=1e-6;%reference value when relaxation completes.
 else
-runtime=2*gpusave;%first run for relaxation
+    runtime=80e-14;%first run for relaxation
+    runtime2=0e-14;%second run for dw motion
+    %tstep=tsteppaper;
+    tstep=4e-18;
+    dmdt_stop=1e-8;%reference value when relaxation completes.
 end
-runtime2=1*gpusave;%second run for dw motion
-dmdt_stop=1e-6;%reference value when relaxation completes.
-else
-runtime=80e-14;%first run for relaxation
-runtime2=0e-14;%second run for dw motion
-%tstep=tsteppaper;    
-tstep=4e-18; 
-dmdt_stop=1e-8;%reference value when relaxation completes.
-end
-Hext=[0,0,0e-3];%corresponding to runtime
-Hext2=[0,0,400e-3];% corresponding to runtime2
 savetstep=400;%to reduce data size
 gpusteps=round(gpusave/tstep);
 bc=1;%0.periodic condition;1,not periodic
 %calc
 if runtime2==0
-   relaxflag=0;%0:no relax, 1: have relax
+    relaxflag=0;%0:no relax, 1: have relax
 else
-   relaxflag=1;  
+    relaxflag=1;
 end
 gamTM=gTM*mub/(hbar*ele);%1/(s.T)refer to "PRL 97, 217202 (2006), Jiang Xin"
 gamRE=gRE*mub/(hbar*ele);
@@ -115,6 +139,12 @@ totstep2=round(runtime2/tstep);
 m_=zeros(3,natom);%initial magnetization
 mark_=0.5*ones(1,natom);%used as a mark
 loc_=linspace(0,(natom-1)*d,natom);%atom location
+if (SOT_DLT || SOT_FLT || STT_DLT || STT_FLT) && ~(rk4==1)
+    error('only rk4 is implemented for spin torque driven')
+end
+if ~(gpuc==1)
+    error('only gpu version is implemented')
+end
 if (1)%
     for ct=1:natom/2%initization for left half spin
         if mod(ct,2)==1%the atom is TM
@@ -160,9 +190,9 @@ else
     end
 end
 if loadstartm
- clear m_
- load('startm_natom1000.mat')
- m_=[mmxstart;mmystart;mmzstart];
+    clear m_
+    load('startm_natom1000.mat')
+    m_=[mmxstart;mmystart;mmzstart];
 end
 %clear ct
 %dynamic calc
