@@ -52,12 +52,12 @@ dsdtx=dsdt1x+alph*dsdt2x+Bd*dbdx+alph*Bd*fbdx+alph*Bf*dbfx+Bf*fbfx;
 dsdty=dsdt1y+alph*dsdt2y+Bd*dbdy+alph*Bd*fbdy+alph*Bf*dbfy+Bf*fbfy;
 dsdtz=dsdt1z+alph*dsdt2z+Bd*dbdz+alph*Bd*fbdz+alph*Bf*dbfz+Bf*fbfz;
 %
-kk1x=scal*dsdtx;kk1y=scal*dsdty;kk1z=scal*dsdtz;
+kk1x=ts*scal*dsdtx;kk1y=ts*scal*dsdty;kk1z=ts*scal*dsdtz;
 %-------------------kk2------------------------
 %sss=ss1+ts/2*kk1;%y[i+1]
-sxtmp=ssx+ts/2*kk1x;
-sytmp=ssy+ts/2*kk1y;
-sztmp=ssz+ts/2*kk1z;
+sxtmp=ssx+1/2*kk1x;
+sytmp=ssy+1/2*kk1y;
+sztmp=ssz+1/2*kk1z;
 %cross(u,v)=(u2v3-u3v2)i+(u3v1-u1v3)j+(u1v2-u2v1)k
 %-cross(sss,hh)=cross(hh,sss) Beff FLT
 u1=hhx;u2=hhy;u3=hhz;
@@ -108,12 +108,12 @@ dsdtx=dsdt1x+alph*dsdt2x+Bd*dbdx+alph*Bd*fbdx+alph*Bf*dbfx+Bf*fbfx;
 dsdty=dsdt1y+alph*dsdt2y+Bd*dbdy+alph*Bd*fbdy+alph*Bf*dbfy+Bf*fbfy;
 dsdtz=dsdt1z+alph*dsdt2z+Bd*dbdz+alph*Bd*fbdz+alph*Bf*dbfz+Bf*fbfz;
 %
-kk2x=scal*dsdtx;kk2y=scal*dsdty;kk2z=scal*dsdtz;
+kk2x=ts*scal*dsdtx;kk2y=ts*scal*dsdty;kk2z=ts*scal*dsdtz;
 %-------------------kk3------------------------
 %sss=ss1+ts/2*kk1;%y[i+1]
-sxtmp2=ssx+ts/2*kk2x;
-sytmp2=ssy+ts/2*kk2y;
-sztmp2=ssz+ts/2*kk2z;
+sxtmp2=ssx+1/2*kk2x;
+sytmp2=ssy+1/2*kk2y;
+sztmp2=ssz+1/2*kk2z;
 
 %cross(u,v)=(u2v3-u3v2)i+(u3v1-u1v3)j+(u1v2-u2v1)k
 %-cross(sss,hh)=cross(hh,sss) Beff FLT
@@ -165,12 +165,12 @@ dsdtx=dsdt1x+alph*dsdt2x+Bd*dbdx+alph*Bd*fbdx+alph*Bf*dbfx+Bf*fbfx;
 dsdty=dsdt1y+alph*dsdt2y+Bd*dbdy+alph*Bd*fbdy+alph*Bf*dbfy+Bf*fbfy;
 dsdtz=dsdt1z+alph*dsdt2z+Bd*dbdz+alph*Bd*fbdz+alph*Bf*dbfz+Bf*fbfz;
 %
-kk3x=scal*dsdtx;kk3y=scal*dsdty;kk3z=scal*dsdtz;
+kk3x=ts*scal*dsdtx;kk3y=ts*scal*dsdty;kk3z=ts*scal*dsdtz;
 %-------------------kk4------------------------
 %sss=ss1+ts/2*kk1;%y[i+1]
-sxtmp3=ssx+ts*kk3x;
-sytmp3=ssy+ts*kk3y;
-sztmp3=ssz+ts*kk3z;
+sxtmp3=ssx+kk3x;
+sytmp3=ssy+kk3y;
+sztmp3=ssz+kk3z;
 
 %cross(u,v)=(u2v3-u3v2)i+(u3v1-u1v3)j+(u1v2-u2v1)k
 %-cross(sss,hh)=cross(hh,sss) Beff FLT
@@ -222,11 +222,11 @@ dsdtx=dsdt1x+alph*dsdt2x+Bd*dbdx+alph*Bd*fbdx+alph*Bf*dbfx+Bf*fbfx;
 dsdty=dsdt1y+alph*dsdt2y+Bd*dbdy+alph*Bd*fbdy+alph*Bf*dbfy+Bf*fbfy;
 dsdtz=dsdt1z+alph*dsdt2z+Bd*dbdz+alph*Bd*fbdz+alph*Bf*dbfz+Bf*fbfz;
 %
-kk4x=scal*dsdtx;kk4y=scal*dsdty;kk4z=scal*dsdtz;
+kk4x=ts*scal*dsdtx;kk4y=ts*scal*dsdty;kk4z=ts*scal*dsdtz;
 %-----------------final---------------------
-snx=ssx+ts/6*(kk1x+2*kk2x+2*kk3x+kk4x);
-sny=ssy+ts/6*(kk1y+2*kk2y+2*kk3y+kk4y);
-snz=ssz+ts/6*(kk1z+2*kk2z+2*kk3z+kk4z);
+snx=ssx+1/6*(kk1x+2*kk2x+2*kk3x+kk4x);
+sny=ssy+1/6*(kk1y+2*kk2y+2*kk3y+kk4y);
+snz=ssz+1/6*(kk1z+2*kk2z+2*kk3z+kk4z);
 normsn=sqrt(snx^2+sny^2+snz^2);
 snx=snx/normsn;
 sny=sny/normsn;

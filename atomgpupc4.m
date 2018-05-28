@@ -21,7 +21,7 @@ dsdtx=dsdt1x+alph*dsdt2x;
 dsdty=dsdt1y+alph*dsdt2y;
 dsdtz=dsdt1z+alph*dsdt2z;
 %
-kk1x=scal*dsdtx;kk1y=scal*dsdty;kk1z=scal*dsdtz;
+kk1x=ts*scal*dsdtx;kk1y=ts*scal*dsdty;kk1z=ts*scal*dsdtz;
 %------------------f(t_{i-1})--------------------------
 %-cross(sss,hh)=cross(hh,sss) Beff FLT
 u1=hhx;u2=hhy;u3=hhz;
@@ -40,7 +40,7 @@ dsdtx=dsdt1x+alph*dsdt2x;
 dsdty=dsdt1y+alph*dsdt2y;
 dsdtz=dsdt1z+alph*dsdt2z;
 %
-kk1xn1=scal*dsdtx;kk1yn1=scal*dsdty;kk1zn1=scal*dsdtz;
+kk1xn1=ts*scal*dsdtx;kk1yn1=ts*scal*dsdty;kk1zn1=ts*scal*dsdtz;
 %------------------f(t_{i-2})--------------------------
 %-cross(sss,hh)=cross(hh,sss) Beff FLT
 u1=hhx;u2=hhy;u3=hhz;
@@ -59,7 +59,7 @@ dsdtx=dsdt1x+alph*dsdt2x;
 dsdty=dsdt1y+alph*dsdt2y;
 dsdtz=dsdt1z+alph*dsdt2z;
 %
-kk1xn2=scal*dsdtx;kk1yn2=scal*dsdty;kk1zn2=scal*dsdtz;
+kk1xn2=ts*scal*dsdtx;kk1yn2=ts*scal*dsdty;kk1zn2=ts*scal*dsdtz;
 %------------------f(t_{i-3})--------------------------
 %-cross(sss,hh)=cross(hh,sss) Beff FLT
 u1=hhx;u2=hhy;u3=hhz;
@@ -78,11 +78,11 @@ dsdtx=dsdt1x+alph*dsdt2x;
 dsdty=dsdt1y+alph*dsdt2y;
 dsdtz=dsdt1z+alph*dsdt2z;
 %
-kk1xn3=scal*dsdtx;kk1yn3=scal*dsdty;kk1zn3=scal*dsdtz;
+kk1xn3=ts*scal*dsdtx;kk1yn3=ts*scal*dsdty;kk1zn3=ts*scal*dsdtz;
 %-----------------predictor final---------------------
-ssxp1=ssx+ts/24*(55*kk1x-59*kk1xn1+37*kk1xn2-3*kk1xn3);
-ssyp1=ssy+ts/24*(55*kk1y-59*kk1yn1+37*kk1yn2-3*kk1yn3);
-sszp1=ssz+ts/24*(55*kk1z-59*kk1zn1+37*kk1zn2-3*kk1zn3);
+ssxp1=ssx+1/24*(55*kk1x-59*kk1xn1+37*kk1xn2-3*kk1xn3);
+ssyp1=ssy+1/24*(55*kk1y-59*kk1yn1+37*kk1yn2-3*kk1yn3);
+sszp1=ssz+1/24*(55*kk1z-59*kk1zn1+37*kk1zn2-3*kk1zn3);
 %% corrector
 %------------------f(t_{i+1})--------------------------
 %-cross(sss,hh)=cross(hh,sss) Beff FLT
@@ -102,11 +102,11 @@ dsdtx=dsdt1x+alph*dsdt2x;
 dsdty=dsdt1y+alph*dsdt2y;
 dsdtz=dsdt1z+alph*dsdt2z;
 %
-kk1xp1=scal*dsdtx;kk1yp1=scal*dsdty;kk1zp1=scal*dsdtz;
+kk1xp1=ts*scal*dsdtx;kk1yp1=ts*scal*dsdty;kk1zp1=ts*scal*dsdtz;
 %-----------------corrector final---------------------
-snx=ssx+ts/24*(9*kk1xp1+19*kk1x-5*kk1xn1+kk1xn2);
-sny=ssy+ts/24*(9*kk1yp1+19*kk1y-5*kk1yn1+kk1yn2);
-snz=ssz+ts/24*(9*kk1zp1+19*kk1z-5*kk1zn1+kk1zn2);
+snx=ssx+1/24*(9*kk1xp1+19*kk1x-5*kk1xn1+kk1xn2);
+sny=ssy+1/24*(9*kk1yp1+19*kk1y-5*kk1yn1+kk1yn2);
+snz=ssz+1/24*(9*kk1zp1+19*kk1z-5*kk1zn1+kk1zn2);
 normsn=sqrt(snx^2+sny^2+snz^2);
 snx=snx/normsn;
 sny=sny/normsn;

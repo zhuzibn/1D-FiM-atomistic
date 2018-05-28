@@ -19,11 +19,11 @@ dsdtx=dsdt1x+alph*dsdt2x;
 dsdty=dsdt1y+alph*dsdt2y;
 dsdtz=dsdt1z+alph*dsdt2z;
 %
-kk1x=scal*dsdtx;kk1y=scal*dsdty;kk1z=scal*dsdtz;
+kk1x=ts*scal*dsdtx;kk1y=ts*scal*dsdty;kk1z=ts*scal*dsdtz;
 %sss=ss1+ts*kk1;%y[i+1]
-sxtmp=ssx+ts*kk1x;
-sytmp=ssy+ts*kk1y;
-sztmp=ssz+ts*kk1z;
+sxtmp=ssx+kk1x;
+sytmp=ssy+kk1y;
+sztmp=ssz+kk1z;
 %cross(u,v)=(u2v3-u3v2)i+(u3v1-u1v3)j+(u1v2-u2v1)k
 %-cross(sss,hh)=cross(hh,sss) Beff FLT
 u1=hhx;u2=hhy;u3=hhz;
@@ -42,11 +42,11 @@ dsdtx=dsdt1x+alph*dsdt2x;
 dsdty=dsdt1y+alph*dsdt2y;
 dsdtz=dsdt1z+alph*dsdt2z;
 %
-kk2x=scal*dsdtx;kk2y=scal*dsdty;kk2z=scal*dsdtz;
+kk2x=ts*scal*dsdtx;kk2y=ts*scal*dsdty;kk2z=ts*scal*dsdtz;
 
-snx=ssx+ts/2*(kk1x+kk2x);
-sny=ssy+ts/2*(kk1y+kk2y);
-snz=ssz+ts/2*(kk1z+kk2z);
+snx=ssx+1/2*(kk1x+kk2x);
+sny=ssy+1/2*(kk1y+kk2y);
+snz=ssz+1/2*(kk1z+kk2z);
 normsn=sqrt(snx^2+sny^2+snz^2);
 snx=snx/normsn;
 sny=sny/normsn;
