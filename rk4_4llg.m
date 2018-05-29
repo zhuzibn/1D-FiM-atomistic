@@ -1,11 +1,9 @@
 tau_c=1;
 ts1=tstep*tau_c; %time step
-t=[linspace(tstep,runtime,totstep1),linspace(runtime+tstep,runtime+runtime2,totstep2)];
-
-mmx_=zeros(round((runtime+runtime2)/tstep),natom);
-mmy_=zeros(round((runtime+runtime2)/tstep),natom);
-mmz_=zeros(round((runtime+runtime2)/tstep),natom);
-
+t=linspace(tstep,runtime,totstep);
+mmx_=zeros(totstep,natom);
+mmy_=zeros(totstep,natom);
+mmz_=zeros(totstep,natom);
 muigpu=zeros(1,natom,'gpuArray');
 scalgpu=zeros(1,natom,'gpuArray');
 for ct2=1:natom
@@ -14,17 +12,14 @@ for ct2=1:natom
 end
 clear ct2
 
+%tmp=((ct0==1)*runtime+(ct0==2)*runtime2)-(ct3-1)*gpusave;
+mmx=zeros(totstep,natom,'gpuArray');
+mmy=zeros(totstep,natom,'gpuArray');
+mmz=zeros(totstep,natom,'gpuArray');
+
 ct3=1;
-ct3relax=round((runtime)/gpusave);
-ct3run=round((runtime2)/gpusave);
-ct3max=ct3relax+ct3run;
+ct3max=round((runtime)/gpusave);
 while ~(ct3>ct3max)
-    if ct3>ct3relax
-        ct0=2;
-    else
-        ct0=1;
-    end
-    %tmp=((ct0==1)*runtime+(ct0==2)*runtime2)-(ct3-1)*gpusave;
     mmx=zeros(gpusteps,natom,'gpuArray');
     mmy=zeros(gpusteps,natom,'gpuArray');
     mmz=zeros(gpusteps,natom,'gpuArray');
@@ -35,7 +30,7 @@ while ~(ct3>ct3max)
         mmx(1,:)=m_(1,:);mmy(1,:)=m_(2,:);mmz(1,:)=m_(3,:);
     end
     clear tmpx tmpy tmpz
-    ct1=1; %count 1
+     ct1=1; %count 1
     while ct1<gpusteps
         mmxtmp=mmx(ct1,:);
         mmytmp=mmy(ct1,:);
@@ -74,9 +69,9 @@ while ~(ct3>ct3max)
         hdmi_y=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');
         hdmi_z=-Dsim./muigpu.*(mmxnext+mmxprevious);
         
-        hext_x=((ct0==1)*Hext(1)+(ct0==2)*Hext2(1))*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
-        hext_y=((ct0==1)*Hext(2)+(ct0==2)*Hext2(2))*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
-        hext_z=((ct0==1)*Hext(3)+(ct0==2)*Hext2(3))*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
+        hext_x=Hext(1)*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
+        hext_y=Hext(2)*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
+        hext_z=Hext(3)*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
         
         hhx=hex_x+hani_x+hdmi_x+hDWani_x+hext_x;
         hhy=hex_y+hani_y+hdmi_y+hDWani_y+hext_y;
@@ -125,7 +120,6 @@ while ~(ct3>ct3max)
     mmz_((ct3-1)*gpusteps+1:ct3*gpusteps,:)=gather(mmz);
     ct3=ct3+1;
 end
-
 clear mmx mmy mmz tmp2xn0 tmp2yn0 tmp2zn0 tmp2xn1 tmp2yn1 tmp2zn1
 clear tmp2xn2 tmp2yn2 tmp2zn2
 mmx=mmx_(1:savetstep:end,:);
@@ -133,8 +127,4 @@ mmy=mmy_(1:savetstep:end,:);
 mmz=mmz_(1:savetstep:end,:);
 clear mmx_ mmy_ mmz_
 t=t(1:savetstep:end);
-if dimensionlessLLG
-    tt=t/tau_c*1e9;%unit[ns]
-else
-    tt=t;
-end
+tt=t;

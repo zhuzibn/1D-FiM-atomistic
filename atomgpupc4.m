@@ -31,7 +31,7 @@ dsdt1y=u3*v1-u1*v3;
 dsdt1z=u1*v2-u2*v1;
 %cross(cross(sss,hh),sss) Beff DLT
 u1=-dsdt1x;u2=-dsdt1y;u3=-dsdt1z;
-v1=ssx;v2=ssy;v3=ssz;
+v1=ssxn1;v2=ssyn1;v3=sszn1;
 dsdt2x=u2*v3-u3*v2;
 dsdt2y=u3*v1-u1*v3;
 dsdt2z=u1*v2-u2*v1;
@@ -50,7 +50,7 @@ dsdt1y=u3*v1-u1*v3;
 dsdt1z=u1*v2-u2*v1;
 %cross(cross(sss,hh),sss) Beff DLT
 u1=-dsdt1x;u2=-dsdt1y;u3=-dsdt1z;
-v1=ssx;v2=ssy;v3=ssz;
+v1=ssxn2;v2=ssyn2;v3=sszn2;
 dsdt2x=u2*v3-u3*v2;
 dsdt2y=u3*v1-u1*v3;
 dsdt2z=u1*v2-u2*v1;
@@ -69,7 +69,7 @@ dsdt1y=u3*v1-u1*v3;
 dsdt1z=u1*v2-u2*v1;
 %cross(cross(sss,hh),sss) Beff DLT
 u1=-dsdt1x;u2=-dsdt1y;u3=-dsdt1z;
-v1=ssx;v2=ssy;v3=ssz;
+v1=ssxn3;v2=ssyn3;v3=sszn3;
 dsdt2x=u2*v3-u3*v2;
 dsdt2y=u3*v1-u1*v3;
 dsdt2z=u1*v2-u2*v1;
@@ -93,7 +93,7 @@ dsdt1y=u3*v1-u1*v3;
 dsdt1z=u1*v2-u2*v1;
 %cross(cross(sss,hh),sss) Beff DLT
 u1=-dsdt1x;u2=-dsdt1y;u3=-dsdt1z;
-v1=ssx;v2=ssy;v3=ssz;
+v1=ssxp1;v2=ssyp1;v3=sszp1;
 dsdt2x=u2*v3-u3*v2;
 dsdt2y=u3*v1-u1*v3;
 dsdt2z=u1*v2-u2*v1;
