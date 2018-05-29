@@ -77,7 +77,6 @@ muRE=(-0.462*T+1105)*(1e3)*d^3;%[A.m^2=J/T]
 delta_sy=0.009204*T-1.8;%[e-7J.s/m^3]
 tstep=2e-15;
 runtime=2*gpusave;%second run for dw motion
-dmdt_stop=1e-6;%reference value when relaxation completes.
 savetstep=400;%to reduce data size
 gpusteps=round(gpusave/tstep);
 bc=1;%0.periodic condition;1,not periodic

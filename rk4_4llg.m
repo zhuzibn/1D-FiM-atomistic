@@ -1,5 +1,3 @@
-tau_c=1;
-ts1=tstep*tau_c; %time step
 t=linspace(tstep,runtime,totstep);
 mmx_=zeros(totstep,natom);
 mmy_=zeros(totstep,natom);
