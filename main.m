@@ -66,8 +66,6 @@ BF=chi*BD;
 %% other parameters
 %natom=1000;
 natom=10;
-dmdt_stop_count=20;%continuously 20 times is recgnized as complete.
-dmdt_stop_count_tmp=0;
 TA_paper=201.66;%from Fig. 1(b) in paper
 TA=149.4642;%calculated from muTM,muRE,gamTM,gamRE in code
 T_=[108.6484,130.3781,152.1078,173.8375,217.2968,239.0265,260.7562,282.4859];
@@ -93,50 +91,35 @@ loc_=linspace(0,(natom-1)*d,natom);%atom location
 % if (SOT_DLT || SOT_FLT || STT_DLT || STT_FLT) && ~(rk4==1)
 %     error('only rk4 is implemented for spin torque driven')
 % end
-if (1)%
-    for ct=1:natom/2%initization for left half spin
-        if mod(ct,2)==1%the atom is TM
-            thet_=10/180*pi;
-            phi_=0;
-            m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
-            mark_(ct)=1;
-        else
-            thet_=(10+180)/180*pi;
-            phi_=0;
-            m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
-            mark_(ct)=0;
-        end
-        
+for ct=1:natom/2%initization for left half spin
+    if mod(ct,2)==1%the atom is TM
+        thet_=10/180*pi;
+        phi_=0;
+        m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
+        mark_(ct)=1;
+    else
+        thet_=(10+180)/180*pi;
+        phi_=0;
+        m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
+        mark_(ct)=0;
     end
-    for ct=natom/2+1:natom%initization for right half spin
-        if mod(ct,2)==1%the atom is TM
-            thet_=(10+180)/180*pi;
-            phi_=0;
-            m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
-            mark_(ct)=1;
-        else
-            thet_=10/180*pi;
-            phi_=0;
-            m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
-            mark_(ct)=0;
-        end
-        
-    end
-else
-    for ct=1:natom
-        if mod(ct,2)==1%the atom is TM
-            thet_=10/180*pi;
-            phi_=0;
-            m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
-            mark_(ct)=1;
-        else
-            thet_=(10+180)/180*pi;
-            phi_=0;
-            m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
-            mark_(ct)=0;
-        end
-    end
+    
 end
+for ct=natom/2+1:natom%initization for right half spin
+    if mod(ct,2)==1%the atom is TM
+        thet_=(10+180)/180*pi;
+        phi_=0;
+        m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
+        mark_(ct)=1;
+    else
+        thet_=10/180*pi;
+        phi_=0;
+        m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
+        mark_(ct)=0;
+    end
+    
+end
+
 if loadstartm
     clear m_
     load('startm_natom1000.mat')

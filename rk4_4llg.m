@@ -11,12 +11,6 @@ for ct2=1:natom
     scalgpu(ct2)=((mod(ct2,2)==1)*gamTM+(mod(ct2,2)==0)*gamRE)/(1+alp^2);%scale parameter
 end
 clear ct2
-
-%tmp=((ct0==1)*runtime+(ct0==2)*runtime2)-(ct3-1)*gpusave;
-mmx=zeros(totstep,natom,'gpuArray');
-mmy=zeros(totstep,natom,'gpuArray');
-mmz=zeros(totstep,natom,'gpuArray');
-
 ct3=1;
 ct3max=round((runtime)/gpusave);
 while ~(ct3>ct3max)
