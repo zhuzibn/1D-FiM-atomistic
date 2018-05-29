@@ -87,7 +87,7 @@ while ~(ct3>ct3max)
             end
         elseif rk4==1 %rk4
             [sxx,syy,szz]=arrayfun(@atomgpurk4,mmxtmp,mmytmp,mmztmp,psjSHEx,psjSHEy,psjSHEz,scalgpu,alp,...
-                tstep,hhx,hhy,hhz,(ct0==1)*BD+(ct0==2)*BD2,(ct0==1)*BF+(ct0==2)*BF2);
+                tstep,hhx,hhy,hhz,BD,BF);
         else%heun
             [sxx,syy,szz]=arrayfun(@atomgpu,mmxtmp,mmytmp,mmztmp,scalgpu,alp,...
                 tstep,hhx,hhy,hhz);%
