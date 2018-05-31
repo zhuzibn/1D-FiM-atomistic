@@ -4,10 +4,13 @@ mmy_=zeros(totstep,natom);
 mmz_=zeros(totstep,natom);
 muigpu=zeros(1,natom,'gpuArray');
 scalgpu=zeros(1,natom,'gpuArray');
+BD=zeros(1,natom,'gpuArray');
 for ct2=1:natom
     muigpu(ct2)=(mod(ct2,2)==1)*muTM+(mod(ct2,2)==0)*muRE;
     scalgpu(ct2)=((mod(ct2,2)==1)*gamTM+(mod(ct2,2)==0)*gamRE)/(1+alp^2);%scale parameter
+    BD(ct2)=hbar/2*thetaSH*jc/(((mod(ct2,2)==1)*msTM+(mod(ct2,2)==0)*msRE)*tz);%[T]
 end
+BF=chi*BD;
 clear ct2
 ct3=1;
 ct3max=round((runtime)/gpusave);

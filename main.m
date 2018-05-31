@@ -5,7 +5,7 @@ clear all;clc;close all;tic
 conf_file();
 DMIenable=0;
 pcs=2;%1,optilex 7040 2,acer laptop 3,Landauer 4,gold-c01
-rk4=2;%1:rk4,0:heun Method,2:4th predictor-corrector
+rk4=1;%1:rk4,0:heun Method,2:4th predictor-corrector
 gpusave=2e-12;%how often saving gpu data
 debugg=0;
 loadstartm=0;%1:load mat file; 0:direct calculate
@@ -46,8 +46,16 @@ jc=0;%[A/m2]
 Hext=[0,0,0e-3];%corresponding to runtime
 %% FiM parameters
 tz=d;%[m],thickness of FiM
-mmu=3.45*mub;%[J/T],refer to 2016-Antiferromagnetic Domain Wall Motion Driven by Spin-Orbit Torques-PRL-Takayuki Shiino
-ms=mmu/d^3;%[A/m], saturation magnetization
+TA_paper=201.66;%from Fig. 1(b) in paper
+TA=149.4642;%calculated from muTM,muRE,gamTM,gamRE in code
+T_=[108.6484,130.3781,152.1078,173.8375,217.2968,239.0265,260.7562,282.4859];
+%corresponds to delta_s=[-0.8,-0.6,-0.4,-0.2,0.2,0.4,0.6,0.8]e-7 [J.s/m^3]
+T=108;%[K]
+%T=260.7562;
+msTM=(-0.6855*T+1242)*(1e3);%[A/m]
+msRE=(-0.462*T+1105)*(1e3);
+muTM=msTM*d^3;%[A.m^2=J/T]
+muRE=msRE*d^3;%[A.m^2=J/T]
 %% SOT parameters
 SOT_DLT=1;%1(0),enable(disable) SOT damping torque
 SOT_FLT=0;%1(0),enable(disable) SOT field-like torque
@@ -61,23 +69,13 @@ if SOT_FLT
 else
     chi=0;
 end
-BD=hbar/2*thetaSH*jc/(ms*tz);%[T]
-BF=chi*BD;
 %% other parameters
 %natom=1000;
 natom=10;
-TA_paper=201.66;%from Fig. 1(b) in paper
-TA=149.4642;%calculated from muTM,muRE,gamTM,gamRE in code
-T_=[108.6484,130.3781,152.1078,173.8375,217.2968,239.0265,260.7562,282.4859];
-%corresponds to delta_s=[-0.8,-0.6,-0.4,-0.2,0.2,0.4,0.6,0.8]e-7 [J.s/m^3]
-T=108;%[K]
-%T=260.7562;
-muTM=(-0.6855*T+1242)*(1e3)*d^3;%[A.m^2=J/T]
-muRE=(-0.462*T+1105)*(1e3)*d^3;%[A.m^2=J/T]
 delta_sy=0.009204*T-1.8;%[e-7J.s/m^3]
 tstep=2e-15;
 runtime=2*gpusave;%second run for dw motion
-savetstep=400;%to reduce data size
+savetstep=1;%to reduce data size
 gpusteps=round(gpusave/tstep);
 bc=1;%0.periodic condition;1,not periodic
 %calc
@@ -92,26 +90,25 @@ loc_=linspace(0,(natom-1)*d,natom);%atom location
 % end
 for ct=1:natom/2%initization for left half spin
     if mod(ct,2)==1%the atom is TM
-        thet_=10/180*pi;
+        thet_=5/180*pi;
         phi_=0;
         m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
         mark_(ct)=1;
     else
-        thet_=(10+180)/180*pi;
+        thet_=(5+180)/180*pi;
         phi_=0;
         m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
         mark_(ct)=0;
-    end
-    
+    end 
 end
 for ct=natom/2+1:natom%initization for right half spin
     if mod(ct,2)==1%the atom is TM
-        thet_=(10+180)/180*pi;
+        thet_=(5+180)/180*pi;
         phi_=0;
         m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
         mark_(ct)=1;
     else
-        thet_=10/180*pi;
+        thet_=5/180*pi;
         phi_=0;
         m_(:,ct)=[sin(thet_)*cos(phi_),sin(thet_)*sin(phi_),cos(thet_)];
         mark_(ct)=0;
@@ -131,9 +128,6 @@ if pcs==3 || pcs==4
 else
     %save('finalgpu.mat')
 end
-%plot_proc();
-
-%save('t1.mat')
 
 
 
