@@ -39,9 +39,9 @@ while ~(ct3>ct3max)
             mmzprevious=circshift(mmztmp,[0,1]);
         end
         
-        hex_x=-Asim./muigpu.*(mmxnext+mmxprevious);
-        hex_y=-Asim./muigpu.*(mmynext+mmyprevious);
-        hex_z=-Asim./muigpu.*(mmznext+mmzprevious);
+        hex_x=-(Asim_next.*mmxnext+Asim_previous.*mmxprevious)./muigpu;
+        hex_y=-(Asim_next.*mmynext+Asim_previous.*mmyprevious)./muigpu;
+        hex_z=-(Asim_next.*mmznext+Asim_previous.*mmzprevious)./muigpu;
         
         hani_x=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');%anisotropy
         hani_y=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');

@@ -9,7 +9,7 @@ rk4=1;%1:rk4,0:heun Method,2:4th predictor-corrector
 gpusave=2e-12;%how often saving gpu data
 debugg=0;
 loadstartm=0;%1:load mat file; 0:direct calculate
-systemselec=2;%1:50%-50% TM-RE,2:FM,3:random FiM
+systemselec=1;%1:50%-50% TM-RE,2:FM,3:random FiM 4:AFM
 %gpuDevice(1)
 %constant
 if pcs==1
@@ -24,8 +24,21 @@ else
 end
 constantfile;
 clear gam
+switch systemselec
+    case 1
+        A_TMRE=7.5e-3*ele;%[J], exchange, prefer AFM
+        A_TMTM=A_TMRE;
+        A_RERE=A_TMRE;
+    case 2
+        A_TMTM=-1.5e-21;%[J], exchange,prefer FM
+        A_RERE=-0.98e-21;
+    case 3
+        compositionn=0.3;%[J]
+        A_TMTM=-1.5e-21;%[J], same as PRB 97, 184410 (2018)
+        A_RERE=-0.98e-21;%[J]
+        A_TMRE=7.63e-21;%[J]
+end
 %params from paper
-Asim=7.5e-3*ele;%[J], exchange
 Ksim=0.4e-3*ele;%[J], easy-axis anisotropy
 kksim=0.2e-6*ele;%[J], DW hard-axis anisotropy
 if DMIenable
@@ -92,10 +105,25 @@ if loadstartm
     load('startm_natom1000.mat')
     m_=[mmxstart;mmystart;mmzstart];
 end
+if (0)%view initial state
+   dwplotstep=1;
+    figure%initial magnetization
+    hold on
+    for ct=1:dwplotstep:natom
+        if mark_(ct)==1
+            quiver3(0,loc_(ct)*1e9,0,m_(1,ct),m_(2,ct),m_(3,ct),'r');
+        else
+            quiver3(0,loc_(ct)*1e9,0,m_(1,ct),m_(2,ct),m_(3,ct),'b');
+        end
+    end
+    xlim([-1 1]);ylim([-5 d*1e9*natom]);zlim([-2 2]);
+    xlabel('x axis');ylabel('y axis');zlabel('z axis');
+    view(-27,20) 
+end
 %dynamic calc
 rk4_4llg(); toc
 if pcs==3 || pcs==4
-    save('finalgpu_tt8.mat')
+    save('final.mat')
 else
     if (1)%compare with previous result
         figure
