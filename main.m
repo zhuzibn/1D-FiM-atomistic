@@ -9,7 +9,7 @@ rk4=1;%1:rk4,0:heun Method,2:4th predictor-corrector
 gpusave=2e-12;%how often saving gpu data
 debugg=0;
 loadstartm=0;%1:load mat file; 0:direct calculate
-systemselec=1;%1:50%-50% TM-RE,2:FM,3:random FiM 4:AFM
+systemselec=4;%1:50%-50% FiM,2:FM,3:random FiM 4:AFM
 %gpuDevice(1)
 %constant
 if pcs==1
@@ -29,7 +29,7 @@ switch systemselec
         A_TMRE=7.5e-3*ele;%[J], exchange, prefer AFM
         A_TMTM=A_TMRE;
         A_RERE=A_TMRE;
-    case 2
+    case 2 
         A_TMTM=-1.5e-21;%[J], exchange,prefer FM
         A_RERE=-0.98e-21;
     case 3
@@ -37,6 +37,9 @@ switch systemselec
         A_TMTM=-1.5e-21;%[J], same as PRB 97, 184410 (2018)
         A_RERE=-0.98e-21;%[J]
         A_TMRE=7.63e-21;%[J]
+    case 4
+        A_TMTM=1.5e-21;%[J], exchange,prefer AFM
+        A_RERE=0.98e-21;
 end
 %params from paper
 Ksim=0.4e-3*ele;%[J], easy-axis anisotropy
@@ -87,7 +90,7 @@ end
 %% time control
 tstep=2e-15;
 runtime=1*gpusave;%second run for dw motion
-savetstep=1;%to reduce data size
+savetstep=10;%to reduce data size
 gpusteps=round(gpusave/tstep);
 totstep=round(runtime/tstep);
 %% other parameters
@@ -126,6 +129,7 @@ if pcs==3 || pcs==4
     save('final.mat')
 else
     if (1)%compare with previous result
+        %save('test.mat');
         figure
         plot(tt,mmx(:,1)','-b','LineWidth',2);
         xlabel('time(ns)','fontsize',15);ylabel('mx','fontsize',15)

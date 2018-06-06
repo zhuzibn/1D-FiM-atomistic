@@ -62,7 +62,24 @@ switch systemselec
             else
                 m_(:,ct)=[sin(thet_RE_right)*cos(phi_),sin(thet_RE_right)*sin(phi_),cos(thet_RE_right)];
             end
-        end 
+        end
+    case 4
+        for ct=1:natom/2%initization for left half spin
+            if mod(ct,2)==1%the atom is TM
+                m_(:,ct)=[sin(thet_TM_left)*cos(phi_),sin(thet_TM_left)*sin(phi_),cos(thet_TM_left)];   
+            else
+                m_(:,ct)=[sin(thet_RE_left)*cos(phi_),sin(thet_RE_left)*sin(phi_),cos(thet_RE_left)];               
+            end
+            mark_(ct)=1;
+        end
+        for ct=natom/2+1:natom%initization for right half spin
+            if mod(ct,2)==1%the atom is TM
+                m_(:,ct)=[sin(thet_TM_right)*cos(phi_),sin(thet_TM_right)*sin(phi_),cos(thet_TM_right)];
+            else
+                m_(:,ct)=[sin(thet_RE_right)*cos(phi_),sin(thet_RE_right)*sin(phi_),cos(thet_RE_right)];
+            end
+            mark_(ct)=1;
+        end
 end
 clear ct
 for ct2=1:natom
