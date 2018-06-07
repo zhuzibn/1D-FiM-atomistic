@@ -4,24 +4,12 @@ clear all;clc;close all;tic
 %control parameter
 conf_file();
 DMIenable=0;
-pcs=2;%1,optilex 7040 2,acer laptop 3,Landauer 4,gold-c01
-rk4=1;%1:rk4,0:heun Method,2:4th predictor-corrector
+rk4=2;%1:rk4,0:heun Method,2:4th predictor-corrector
 gpusave=2e-12;%how often saving gpu data
-debugg=0;
+debugg=1;
 loadstartm=0;%1:load mat file; 0:direct calculate
-systemselec=4;%1:50%-50% FiM,2:FM,3:random FiM 4:AFM
+systemselec=1;%1:50%-50% FiM,2:FM,3:random FiM 4:AFM
 %gpuDevice(1)
-%constant
-if pcs==1
-    addpath('E:\dropbox\Dropbox\phd\code\general\gitcontrol\constant');
-elseif pcs==2
-    addpath('E:\Dropbox\Dropbox\phd\code\general\gitcontrol\constant');
-    addpath(genpath('E:\Dropbox\Dropbox\phd\code\general\nogitcontrol'));
-elseif pcs==3
-    addpath('/home/a0132576/code/general/general/constant');
-else
-    addpath('/home/svu/a0132576/code/general/constant');
-end
 constantfile;
 clear gam
 switch systemselec
@@ -125,7 +113,7 @@ if (0)%view initial state
 end
 %dynamic calc
 rk4_4llg(); toc
-if pcs==3 || pcs==4
+if ~debugg
     save('final.mat')
 else
     if (1)%compare with previous result
