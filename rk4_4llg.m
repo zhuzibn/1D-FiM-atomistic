@@ -51,9 +51,9 @@ while ~(ct3>ct3max)
         hDWani_y=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');
         hDWani_z=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');
         
-        hdmi_x=-Dsim./muigpu.*(-mmznext-mmzprevious);
+        hdmi_x=-Dsim./muigpu.*(-mmznext+mmzprevious);
         hdmi_y=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');
-        hdmi_z=-Dsim./muigpu.*(mmxnext+mmxprevious);
+        hdmi_z=-Dsim./muigpu.*(mmxnext-mmxprevious);
         
         hext_x=Hext(1)*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
         hext_y=Hext(2)*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
