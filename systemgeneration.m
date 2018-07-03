@@ -1,10 +1,5 @@
 m_=zeros(3,natom);%initial magnetization
 mark_=0.5*ones(1,natom);%used as a mark
-muigpu=zeros(1,natom,'gpuArray');
-scalgpu=zeros(1,natom,'gpuArray');
-BD=zeros(1,natom,'gpuArray');
-Asim_next=zeros(1,natom,'gpuArray');
-Asim_previous=zeros(1,natom,'gpuArray');
 thet_TM_left=5/180*pi;
 thet_RE_left=(5+180)/180*pi;
 thet_TM_right=(5+180)/180*pi;
@@ -82,51 +77,3 @@ switch systemselec
         end
 end
 clear ct
-for ct2=1:natom
-    muigpu(ct2)=(mark_(ct2)==1)*muTM+(mark_(ct2)==0)*muRE;
-    scalgpu(ct2)=((mark_(ct2)==1)*gamTM+(mark_(ct2)==0)*gamRE)/(1+alp^2);%scale parameter
-    BD(ct2)=hbar/2*thetaSH*jc/(((mark_(ct2)==1)*msTM+(mark_(ct2)==0)*msRE)*tz);%[T]
-    if mark_(ct2)==1%local atom is TM
-        if ct2==natom
-            Asim_next(ct2)=0;
-        else
-            if mark_(ct2+1)==1%next atom is TM
-                Asim_next(ct2)=A_TMTM;
-            else
-                Asim_next(ct2)=A_TMRE;
-            end
-        end
-        
-        if ct2==1
-            Asim_previous(ct2)=0;
-        else
-            if mark_(ct2-1)==1%previous atom is TM
-                Asim_previous(ct2)=A_TMTM;
-            else
-                Asim_previous(ct2)=A_TMRE;
-            end
-        end
-    else%local atom is RE
-        if ct2==natom
-            Asim_next(ct2)=0;
-        else
-            if mark_(ct2+1)==1%next atom is TM
-                Asim_next(ct2)=A_TMRE;
-            else
-                Asim_next(ct2)=A_RERE;
-            end
-        end
-        
-        if ct2==1
-            Asim_previous(ct2)=0;
-        else
-            if mark_(ct2-1)==1%previous atom is TM
-                Asim_previous(ct2)=A_TMRE;
-            else
-                Asim_previous(ct2)=A_RERE;
-            end
-        end
-    end
-end
-clear ct2
-BF=chi*BD;

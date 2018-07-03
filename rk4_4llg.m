@@ -2,6 +2,10 @@ t=linspace(tstep,runtime,totstep);
 mmx_=zeros(totstep,natom);
 mmy_=zeros(totstep,natom);
 mmz_=zeros(totstep,natom);
+Eex_=zeros(totstep,1);
+Eani_=zeros(totstep,1);
+EDWani_=zeros(totstep,1);
+Edmi_=zeros(totstep,1);
 
 ct3=1;
 ct3max=round((runtime)/gpusave);
@@ -9,7 +13,10 @@ while ~(ct3>ct3max)
     mmx=zeros(gpusteps,natom,'gpuArray');
     mmy=zeros(gpusteps,natom,'gpuArray');
     mmz=zeros(gpusteps,natom,'gpuArray');
-    
+    Eex=zeros(gpusteps,1,'gpuArray');
+    Eani=zeros(gpusteps,1,'gpuArray');
+    EDWani=zeros(gpusteps,1,'gpuArray');
+    Edmi=zeros(gpusteps,1,'gpuArray');
     if ~(ct3==1)
         mmx(1,:)=tmp2xn0;mmy(1,:)=tmp2yn0;mmz(1,:)=tmp2zn0;
     else
@@ -42,18 +49,24 @@ while ~(ct3>ct3max)
         hex_x=-(Asim_next.*mmxnext+Asim_previous.*mmxprevious)./muigpu;
         hex_y=-(Asim_next.*mmynext+Asim_previous.*mmyprevious)./muigpu;
         hex_z=-(Asim_next.*mmznext+Asim_previous.*mmzprevious)./muigpu;
+        Eex(ct1)=sum(Asim_next.*(mmxtmp.*mmxnext+mmytmp.*mmynext+mmztmp.*mmznext)+...
+            Asim_previous.*(mmxtmp.*mmxprevious+mmytmp.*mmyprevious+mmztmp.*mmzprevious));
         
         hani_x=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');%anisotropy
         hani_y=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');
         hani_z=2*Ksim./muigpu.*mmztmp;
+        Eani(ct1)=sum(-Ksim.*(mmztmp.^2));
         
         hDWani_x=-2*kksim./muigpu.*mmxtmp;%anisotropy
         hDWani_y=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');
         hDWani_z=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');
+        EDWani(ct1)=sum(kksim.*(mmxtmp.^2));
         
         hdmi_x=-Dsim./muigpu.*(-mmznext+mmzprevious);
         hdmi_y=zeros(size(hex_x,1),size(hex_x,2),'gpuArray');
         hdmi_z=-Dsim./muigpu.*(mmxnext-mmxprevious);
+        Edmi(ct1)=sum(Dsim.*(mmztmp.*mmxnext-mmxtmp.*mmznext+...
+            mmzprevious.*mmxtmp-mmxprevious.*mmztmp));
         
         hext_x=Hext(1)*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
         hext_y=Hext(2)*ones(size(hex_x,1),size(hex_x,2),'gpuArray');
@@ -104,13 +117,21 @@ while ~(ct3>ct3max)
     mmx_((ct3-1)*gpusteps+1:ct3*gpusteps,:)=gather(mmx);
     mmy_((ct3-1)*gpusteps+1:ct3*gpusteps,:)=gather(mmy);
     mmz_((ct3-1)*gpusteps+1:ct3*gpusteps,:)=gather(mmz);
+    Eex_((ct3-1)*gpusteps+1:ct3*gpusteps)=gather(Eex);
+    Eani_((ct3-1)*gpusteps+1:ct3*gpusteps)=gather(Eani);
+    EDWani_((ct3-1)*gpusteps+1:ct3*gpusteps)=gather(EDWani);
+    Edmi_((ct3-1)*gpusteps+1:ct3*gpusteps)=gather(Edmi);
     ct3=ct3+1;
 end
-clear mmx mmy mmz tmp2xn0 tmp2yn0 tmp2zn0 tmp2xn1 tmp2yn1 tmp2zn1
+clear mmx mmy mmz tmp2xn0 tmp2yn0 tmp2zn0 tmp2xn1 tmp2yn1 tmp2zn1 Eex Eani EDWani Edmi
 clear tmp2xn2 tmp2yn2 tmp2zn2
 mmx=mmx_(1:savetstep:end,:);
 mmy=mmy_(1:savetstep:end,:);
 mmz=mmz_(1:savetstep:end,:);
-clear mmx_ mmy_ mmz_
+Eex=Eex_(1:savetstep:end);
+Eani=Eani_(1:savetstep:end);
+EDWani=EDWani_(1:savetstep:end);
+Edmi=Edmi_(1:savetstep:end);
+clear mmx_ mmy_ mmz_ Eex_ Eani_ EDWani_ Edmi_
 t=t(1:savetstep:end);
 tt=t;

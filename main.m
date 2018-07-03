@@ -4,8 +4,8 @@ clear all;clc;close all;tic
 %control parameter
 conf_file();
 DMIenable=0;
-rk4=2;%1:rk4,0:heun Method,2:4th predictor-corrector
-gpusave=2e-12;%how often saving gpu data
+rk4=1;%1:rk4,0:heun Method,2:4th predictor-corrector
+gpusave=5e-12;%how often saving gpu data
 debugg=1;
 loadstartm=0;%1:load mat file; 0:direct calculate
 systemselec=1;%1:50%-50% FiM,2:FM,3:random FiM 4:AFM
@@ -77,25 +77,35 @@ else
 end
 %% time control
 tstep=2e-15;
-runtime=1*gpusave;%second run for dw motion
+runtime=3*gpusave;%second run for dw motion
 savetstep=10;%to reduce data size
 gpusteps=round(gpusave/tstep);
 totstep=round(runtime/tstep);
 %% other parameters
 %natom=1000;
-natom=10;
+natom=20;
 delta_sy=0.009204*T-1.8;%[e-7J.s/m^3]
 bc=1;%0.periodic condition;1,not periodic
 loc_=linspace(0,(natom-1)*d,natom);%atom location
-% if (SOT_DLT || SOT_FLT || STT_DLT || STT_FLT) && ~(rk4==1)
-%     error('only rk4 is implemented for spin torque driven')
-% end
 systemgeneration();
 if loadstartm
     clear m_
-    load('startm_natom1000.mat')
+    if systemselec==3
+        if compositionn==0.3
+        load('startm_TT108_natom200_pc4_0.3.mat')
+        elseif compositionn==0.4
+            load('0.5.mat')
+        elseif compositionn==0.5
+            load('startm_TT108_natom200_pc4_0.5.mat')
+        elseif compositionn==0.6
+            load('startm_TT108_natom200_pc4_0.6.mat')
+        else
+           error('this composition is not inilitized') 
+        end
+    end
     m_=[mmxstart;mmystart;mmzstart];
 end
+systemgenerationB();
 if (0)%view initial state
    dwplotstep=1;
     figure%initial magnetization
