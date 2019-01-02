@@ -15,10 +15,10 @@ T_=tempera(10,t*1e9,0)+T0;
 if (0)%view the interpolated "Ms vs T"
     figure;
     plot(T_+T0,MsT_TM,'-*');
-    xlabel('T(K)','Ms_{TM}(kA/m)')
+    xlabel('T(K)','Ms_{TM}(A/m)')
     figure;
     plot(T_+T0,MsT_RE,'-*');
-    xlabel('T(K)','Ms_{TM}(kA/m)')
+    xlabel('T(K)','Ms_{TM}(A/m)')
 end
 muTM=MsT_TM*d^3;%[A.m^2=J/T]
 muRE=MsT_RE*d^3;%[A.m^2=J/T]
