@@ -7,7 +7,7 @@ thet_RE_right=5/180*pi;
 phi_=0;
 switch systemselec
     case 1
-        for ct=1:natom/2%initization for left half spin
+        for ct=1:natom/5%initization for left half spin
             if mod(ct,2)==1%the atom is TM
                 m_(:,ct)=[sin(thet_TM_left)*cos(phi_),sin(thet_TM_left)*sin(phi_),cos(thet_TM_left)];
                 mark_(ct)=1;
@@ -16,7 +16,7 @@ switch systemselec
                 mark_(ct)=0;
             end
         end
-        for ct=natom/2+1:natom%initization for right half spin
+        for ct=natom/5+1:natom%initization for right half spin
             if mod(ct,2)==1%the atom is TM
                 m_(:,ct)=[sin(thet_TM_right)*cos(phi_),sin(thet_TM_right)*sin(phi_),cos(thet_TM_right)];
                 mark_(ct)=1;

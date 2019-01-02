@@ -9,6 +9,19 @@ Edmi_=zeros(totstep,1);
 
 ct3=1;
 ct3max=round((runtime)/gpusave);
+scalgpu=((mark_==1)*gamTM+(mark_==0)*gamRE)/(1+alp^2);%scale parameter
+T_=tempera(10,t*1e9,0)+T0;
+[MsT_TM,MsT_RE]=MsTemper(T_);
+if (0)%view the interpolated "Ms vs T"
+    figure;
+    plot(T_+T0,MsT_TM,'-*');
+    xlabel('T(K)','Ms_{TM}(kA/m)')
+    figure;
+    plot(T_+T0,MsT_RE,'-*');
+    xlabel('T(K)','Ms_{TM}(kA/m)')
+end
+muTM=MsT_TM*d^3;%[A.m^2=J/T]
+muRE=MsT_RE*d^3;%[A.m^2=J/T]
 while ~(ct3>ct3max)
     mmx=zeros(gpusteps,natom,'gpuArray');
     mmy=zeros(gpusteps,natom,'gpuArray');
@@ -24,7 +37,11 @@ while ~(ct3>ct3max)
     end
     clear tmpx tmpy tmpz
     ct1=1; %count 1
+    
     while ct1<gpusteps
+        muigpu=(mark_==1)*muTM((ct3-1)*gpusteps+ct1)+(mark_==0)*muRE((ct3-1)*gpusteps+ct1);
+        BD=hbar/2*thetaSH*jc./(((mark_==1)*MsT_TM((ct3-1)*gpusteps+ct1)+(mark_==0)*MsT_RE((ct3-1)*gpusteps+ct1))*tz);%[T]
+        BF=chi*BD;
         mmxtmp=mmx(ct1,:);
         mmytmp=mmy(ct1,:);
         mmztmp=mmz(ct1,:);

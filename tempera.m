@@ -1,10 +1,14 @@
-% developed by Kaiming
+% created by Kaiming
 % modified by Zhifeng
 %I=10;t=0.1; %default for testing, please use the calculated values and remove this line
 % Io=10 mA
 %testt: if this run is for testing
 % I unit mA t unit ns
-function output=Temperature(I,t,testt)
+function output=tempera(I,t,testt)
+if testt
+   I=10;
+   t=0.1;
+end
 ratio=(I/10).^2;
 
 Temperature_time=[0	300
