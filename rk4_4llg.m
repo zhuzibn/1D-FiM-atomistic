@@ -1,4 +1,6 @@
-t=linspace(tstep,runtime,totstep);
+ct3=1;
+scalgpu=((mark_==1)*gamTM+(mark_==0)*gamRE)/(1+alp^2);%scale parameter
+
 mmx_=zeros(totstep,natom);
 mmy_=zeros(totstep,natom);
 mmz_=zeros(totstep,natom);
@@ -6,23 +8,18 @@ Eex_=zeros(totstep,1);
 Eani_=zeros(totstep,1);
 EDWani_=zeros(totstep,1);
 Edmi_=zeros(totstep,1);
-
-ct3=1;
-ct3max=round((runtime)/gpusave);
-scalgpu=((mark_==1)*gamTM+(mark_==0)*gamRE)/(1+alp^2);%scale parameter
-T_=tempera(10,t*1e9,0)+T0;
-[MsT_TM,MsT_RE]=MsTemper(T_);
-if (0)%view the interpolated "Ms vs T"
-    figure;
-    plot(T_+T0,MsT_TM,'-*');
-    xlabel('T(K)','Ms_{TM}(A/m)')
-    figure;
-    plot(T_+T0,MsT_RE,'-*');
-    xlabel('T(K)','Ms_{TM}(A/m)')
-end
-muTM=MsT_TM*d^3;%[A.m^2=J/T]
-muRE=MsT_RE*d^3;%[A.m^2=J/T]
+T2_=zeros(totstep,1);
+MsT_TM2=zeros(totstep,1);
+MsT_RE2=zeros(totstep,1);
+tt=zeros(totstep,1);
 while ~(ct3>ct3max)
+    t=linspace((ct3-1)*gpusave+tstep,ct3*gpusave,gpusteps);
+
+    T_=tempera(10,t*1e9,0)+T0;
+    [MsT_TM,MsT_RE]=MsTemper(T_);
+    muTM=MsT_TM*d^3;%[A.m^2=J/T]
+    muRE=MsT_RE*d^3;%[A.m^2=J/T]
+    
     mmx=zeros(gpusteps,natom,'gpuArray');
     mmy=zeros(gpusteps,natom,'gpuArray');
     mmz=zeros(gpusteps,natom,'gpuArray');
@@ -39,8 +36,8 @@ while ~(ct3>ct3max)
     ct1=1; %count 1
     
     while ct1<gpusteps
-        muigpu=(mark_==1)*muTM((ct3-1)*gpusteps+ct1)+(mark_==0)*muRE((ct3-1)*gpusteps+ct1);
-        BD=hbar/2*thetaSH*jc./(((mark_==1)*MsT_TM((ct3-1)*gpusteps+ct1)+(mark_==0)*MsT_RE((ct3-1)*gpusteps+ct1))*tz);%[T]
+        muigpu=(mark_==1)*muTM(ct1)+(mark_==0)*muRE(ct1);
+        BD=hbar/2*thetaSH*jc./(((mark_==1)*MsT_TM(ct1)+(mark_==0)*MsT_RE(ct1))*tz);%[T]
         BF=chi*BD;
         mmxtmp=mmx(ct1,:);
         mmytmp=mmy(ct1,:);
@@ -131,24 +128,28 @@ while ~(ct3>ct3max)
     tmp2xn0=mmx(end,:);tmp2yn0=mmy(end,:);tmp2zn0=mmz(end,:);
     tmp2xn1=mmx(end-1,:);tmp2yn1=mmy(end-1,:);tmp2zn1=mmz(end-1,:);
     tmp2xn2=mmx(end-2,:);tmp2yn2=mmy(end-2,:);tmp2zn2=mmz(end-2,:);
-    mmx_((ct3-1)*gpusteps+1:ct3*gpusteps,:)=gather(mmx);
-    mmy_((ct3-1)*gpusteps+1:ct3*gpusteps,:)=gather(mmy);
-    mmz_((ct3-1)*gpusteps+1:ct3*gpusteps,:)=gather(mmz);
-    Eex_((ct3-1)*gpusteps+1:ct3*gpusteps)=gather(Eex);
-    Eani_((ct3-1)*gpusteps+1:ct3*gpusteps)=gather(Eani);
-    EDWani_((ct3-1)*gpusteps+1:ct3*gpusteps)=gather(EDWani);
-    Edmi_((ct3-1)*gpusteps+1:ct3*gpusteps)=gather(Edmi);
+    
+    tt((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=t(savetstep:savetstep:end);
+    T2_((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=T_(savetstep:savetstep:end);
+    MsT_TM2((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=MsT_TM(savetstep:savetstep:end);
+    MsT_RE2((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=MsT_RE(savetstep:savetstep:end);
+    mmx_((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=gather(mmx(savetstep:savetstep:end,:));
+    mmy_((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=gather(mmy(savetstep:savetstep:end,:));
+    mmz_((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=gather(mmz(savetstep:savetstep:end,:));
+    Eex_((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=gather(Eex(savetstep:savetstep:end,:));
+    Eani_((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=gather(Eani(savetstep:savetstep:end,:));
+    EDWani_((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=gather(EDWani(savetstep:savetstep:end,:));
+    Edmi_((ct3-1)*round(gpusteps/savetstep)+1:ct3*round(gpusteps/savetstep),:)=gather(Edmi(savetstep:savetstep:end,:));
+
     ct3=ct3+1;
 end
 clear mmx mmy mmz tmp2xn0 tmp2yn0 tmp2zn0 tmp2xn1 tmp2yn1 tmp2zn1 Eex Eani EDWani Edmi
 clear tmp2xn2 tmp2yn2 tmp2zn2
-mmx=mmx_(1:savetstep:end,:);
-mmy=mmy_(1:savetstep:end,:);
-mmz=mmz_(1:savetstep:end,:);
-Eex=Eex_(1:savetstep:end);
-Eani=Eani_(1:savetstep:end);
-EDWani=EDWani_(1:savetstep:end);
-Edmi=Edmi_(1:savetstep:end);
+mmx=mmx_;
+mmy=mmy_;
+mmz=mmz_;
+Eex=Eex_;
+Eani=Eani_;
+EDWani=EDWani_;
+Edmi=Edmi_;
 clear mmx_ mmy_ mmz_ Eex_ Eani_ EDWani_ Edmi_
-t=t(1:savetstep:end);
-tt=t;

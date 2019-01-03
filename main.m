@@ -5,9 +5,9 @@ clear all;clc;close all;tic
 conf_file();
 DMIenable=1;
 rk4=1;%1:rk4,0:heun Method,2:4th predictor-corrector
-gpusave=5e-12;%how often saving gpu data
+gpusave=20e-12;%how often saving gpu data
 debugg=0;
-loadstartm=0;%1:load mat file; 0:direct calculate
+loadstartm=1;%1:load mat file; 0:direct calculate
 systemselec=1;%1:50%-50% FiM,2:FM,3:random FiM 4:AFM
 gpuDevice(1)
 constantfile;
@@ -17,7 +17,7 @@ switch systemselec
         A_TMRE=15e-3*ele;%[J], exchange, prefer AFM
         A_TMTM=A_TMRE;
         A_RERE=A_TMRE;
-    case 2 
+    case 2
         A_TMTM=-1.5e-21;%[J], exchange,prefer FM
         A_RERE=-0.98e-21;
     case 3
@@ -41,7 +41,7 @@ d=0.4e-9;%[m],distance between two spin
 alp=0.02;%Gilbert damping
 gTM=2.2;gRE=2;%g-factor
 %% electrical parameters
-jc=512e9;%[A/m2]
+jc=256e9;%[A/m2]
 Hext=[0,0,0e-3];%corresponding to runtime
 %% FiM parameters
 tz=d;%[m],thickness of FiM
@@ -62,13 +62,15 @@ else
     chi=0;
 end
 %% time control
-tstep=2048e-18;
-runtime=10*gpusave;%second run for dw motion
-savetstep=128;%to reduce data size
+tstep=2000e-18;
+runtime=200*gpusave;%second run for dw motion
 gpusteps=round(gpusave/tstep);
-totstep=round(runtime/tstep);
+ct3max=round(runtime/gpusave);
+numpersave=5;
+savetstep=gpusteps/numpersave;%to reduce data size
+totstep=numpersave*ct3max;
 %% other parameters
-natom=20;
+natom=12500;
 bc=1;%0.periodic condition;1,not periodic
 loc_=linspace(0,(natom-1)*d,natom);%atom location
 systemgeneration();
@@ -76,7 +78,7 @@ if loadstartm
     clear m_
     if systemselec==3
         if compositionn==0.3
-        load('startm_TT108_natom200_pc4_0.3.mat')
+            load('startm_TT108_natom200_pc4_0.3.mat')
         elseif compositionn==0.4
             load('0.5.mat')
         elseif compositionn==0.5
@@ -84,15 +86,15 @@ if loadstartm
         elseif compositionn==0.6
             load('startm_TT108_natom200_pc4_0.6.mat')
         else
-           error('this composition is not inilitized') 
+            error('this composition is not inilitized')
         end
     end
-    load('startm_ms700_A15.mat')
+    load('startm_natom12500_x234.mat')
     m_=[mmxstart;mmystart;mmzstart];
 end
 systemgenerationB();
 if (0)%view initial state
-   dwplotstep=1;
+    dwplotstep=1;
     figure%initial magnetization
     hold on
     for ct=1:dwplotstep:natom
@@ -104,7 +106,7 @@ if (0)%view initial state
     end
     xlim([-1 1]);ylim([-5 d*1e9*natom]);zlim([-2 2]);
     xlabel('x axis');ylabel('y axis');zlabel('z axis');
-    view(-27,20) 
+    view(-27,20)
 end
 %dynamic calc
 rk4_4llg(); toc
@@ -118,11 +120,11 @@ else
         xlabel('time(ns)','fontsize',15);ylabel('mx','fontsize',15)
         set(gca,'fontsize',20)
         %xlim([0,15]);ylim([-1.05,1.05]);
-%         hold on
-%         clear all
-%         load('test.mat');
-%         plot(tt,mmx(:,1)','-r','LineWidth',1);
-%         legend('new','old')
+        %         hold on
+        %         clear all
+        %         load('test.mat');
+        %         plot(tt,mmx(:,1)','-r','LineWidth',1);
+        %         legend('new','old')
     end
 end
 
